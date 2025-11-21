@@ -1,0 +1,48 @@
+name: 12-Hour-RDP
+
+on:
+  workflow_dispatch:
+
+jobs:
+  first-session:
+    runs-on: windows-latest
+    steps:
+      - name: Download RustDesk Host
+        shell: powershell
+        run: |
+          Invoke-WebRequest "https://github.com/rustdesk/rustdesk/releases/latest/download/rustdesk-host-windows-x86_64.exe" -OutFile "rustdesk.exe"
+
+      - name: Install RustDesk
+        shell: powershell
+        run: |
+          Start-Process ".\rustdesk.exe" -ArgumentList "/VERYSILENT" -Wait
+
+      - name: Start RustDesk Service
+        shell: powershell
+        run: |
+          Start-Service RustDesk
+
+      - name: Show RustDesk Info
+        shell: powershell
+        run: |
+          Write-Output "---- RustDesk Login ----"
+          Write-Output "Owner: Wahab"
+          Write-Output "ID:"
+          Get-Content "C:\Program Files\RustDesk\id"
+          Write-Output "Password:"
+          Get-Content "C:\Program Files\RustDesk\password"
+
+      - name: Keep Alive (6 Hours)
+        shell: powershell
+        run: |
+          Start-Sleep -Seconds 21600
+
+  second-session:
+    needs: first-session
+    runs-on: windows-latest
+    steps:
+      - name: New 6-Hour Session
+        shell: powershell
+        run: |
+          Write-Output "Starting NEW 6-hour session for Owner: Wahab..."
+          Start-Sleep -Seconds 21600
