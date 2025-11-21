@@ -1,0 +1,33 @@
+name: Unlimited-RDP
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - name: Download RustDesk Host
+      run: |
+        Invoke-WebRequest "https://raw.githubusercontent.com/rustdesk/rustdesk/master/build/win/nhost.exe" -OutFile "rustdesk.exe"
+
+    - name: Install RustDesk
+      run: |
+        Start-Process .\rustdesk.exe -ArgumentList "/S" -Wait
+
+    - name: Start RustDesk Service
+      run: |
+        Start-Service RustDesk
+
+    - name: Show RustDesk ID & Password
+      run: |
+        Get-Content "C:\Program Files\RustDesk\RustDesk Service\id"
+        Write-Host "--------------------------------------"
+        Write-Host "Password will show on RustDesk window."
+
+    - name: Keep RDP Alive (Unlimited)
+      run: |
+        while ($true) {
+          Start-Sleep -Seconds 300
+        }
