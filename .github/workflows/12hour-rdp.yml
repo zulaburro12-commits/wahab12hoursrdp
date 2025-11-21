@@ -1,48 +1,32 @@
-name: 12-Hour-RDP
+name: Ultra-RDP-12Hours
 
-on:
-  workflow_dispatch:
+on: workflow_dispatch
 
 jobs:
-  first-session:
+  build:
     runs-on: windows-latest
+
     steps:
-      - name: Download RustDesk Host
-        shell: powershell
-        run: |
-          Invoke-WebRequest "https://github.com/rustdesk/rustdesk/releases/latest/download/rustdesk-host-windows-x86_64.exe" -OutFile "rustdesk.exe"
+    - name: Download RustDesk Host
+      run: |
+        Invoke-WebRequest "https://raw.githubusercontent.com/rustdesk/rustdesk/master/build/win/winhost.exe" -OutFile "rustdesk.exe"
 
-      - name: Install RustDesk
-        shell: powershell
-        run: |
-          Start-Process ".\rustdesk.exe" -ArgumentList "/VERYSILENT" -Wait
+    - name: Install RustDesk
+      run: |
+        Start-Process .\rustdesk.exe -ArgumentList "/S" -Wait
 
-      - name: Start RustDesk Service
-        shell: powershell
-        run: |
-          Start-Service RustDesk
+    - name: Start RustDesk Service
+      run: |
+        Start-Service RustDesk
 
-      - name: Show RustDesk Info
-        shell: powershell
-        run: |
-          Write-Output "---- RustDesk Login ----"
-          Write-Output "Owner: Wahab"
-          Write-Output "ID:"
-          Get-Content "C:\Program Files\RustDesk\id"
-          Write-Output "Password:"
-          Get-Content "C:\Program Files\RustDesk\password"
+    - name: Show RustDesk ID & Password
+      run: |
+        Get-Content "C:\Program Files\RustDesk\RustDesk\id"
+        Get-Content "C:\Program Files\RustDesk\RustDesk\password"
 
-      - name: Keep Alive (6 Hours)
-        shell: powershell
-        run: |
-          Start-Sleep -Seconds 21600
-
-  second-session:
-    needs: first-session
-    runs-on: windows-latest
-    steps:
-      - name: New 6-Hour Session
-        shell: powershell
-        run: |
-          Write-Output "Starting NEW 6-hour session for Owner: Wahab..."
-          Start-Sleep -Seconds 21600
+    - name: Keep RDP Alive (12 Hours)
+      run: |
+        for ($i=0; $i -lt 720; $i++) {
+          Write-Host "RDP Running $i min"
+          Start-Sleep -Seconds 60
+        }
