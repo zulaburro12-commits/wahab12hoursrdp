@@ -1,0 +1,33 @@
+name: Chrome-Remote-Desktop
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - name: Install CRD
+      run: |
+        curl -o crd.msi https://dl.google.com/dl/edgedl/chrome-remote-desktop/chromeremotedesktophost.msi
+        msiexec /i crd.msi /quiet /qn /norestart
+
+    - name: Install Google Chrome
+      run: |
+        curl -o chrome_installer.exe https://dl.google.com/chrome/install/GoogleChromeStandaloneEnterprise64.msi
+        msiexec /i chrome_installer.exe /quiet /qn /norestart
+
+    - name: Display Login URL
+      run: |
+        Write-Host "======================================"
+        Write-Host "CHROME REMOTE DESKTOP IS READY"
+        Write-Host "Go here on your browser:"
+        Write-Host "https://remotedesktop.google.com/headless"
+        Write-Host "======================================"
+
+    - name: Keep Alive
+      run: |
+        while ($true) {
+          Start-Sleep -Seconds 300
+        }
